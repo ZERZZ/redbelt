@@ -1,0 +1,10 @@
+# Project-specific
+todo.txt
+
+# Python bytecode caches (every module/subdirectory)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/

